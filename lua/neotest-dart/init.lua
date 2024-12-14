@@ -106,9 +106,11 @@ local function get_strategy_config(strategy, path, script_args)
           utils.join_path(vim.loop.cwd(), '.fvm', 'flutter_sdk', 'bin', 'flutter')
         dap_command = vim.loop.fs_realpath(flutter_bin_symlink) or 'flutter'
       end
+      local cwd = adapter.root(path)
       dap.adapters.dart_test = {
         type = 'executable',
         command = dap_command,
+        cwd = cwd,
         args = { 'debug-adapter', '--test' },
         options = { -- Dartls is slow to start so avoid warnings from nvim-dap
           initialize_timeout_sec = 30,
@@ -118,6 +120,7 @@ local function get_strategy_config(strategy, path, script_args)
         type = 'dart_test',
         name = 'Neotest Debugger',
         request = 'launch',
+        cwd = cwd,
         program = path,
         args = script_args,
         evaluateToStringInDebugViews = true,
@@ -188,6 +191,7 @@ function adapter.build_spec(args)
 
   return {
     command = full_command,
+    cwd = adapter.root(position.path),
     context = {
       results_path = results_path,
       file = position.path,
