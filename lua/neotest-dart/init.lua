@@ -13,6 +13,7 @@ adapter.root = lib.files.match_root_pattern('pubspec.yaml')
 --- Command to use for running tests. Value is set from config
 local command = 'flutter'
 local custom_test_method_names = {}
+local exception_breakpoints = 'default'
 
 local outline = {}
 
@@ -108,6 +109,7 @@ local function get_strategy_config(strategy, path, script_args)
         dap_command = vim.loop.fs_realpath(flutter_bin_symlink) or 'flutter'
       end
       local cwd = adapter.root(path)
+      dap.defaults.dart_test.exception_breakpoints = exception_breakpoints
       dap.adapters.dart_test = {
         type = 'executable',
         command = dap_command,
@@ -230,6 +232,9 @@ setmetatable(adapter, {
   __call = function(_, config)
     if config.command then
       command = config.command
+    end
+    if config.exception_breakpoints then
+      exception_breakpoints = config.exception_breakpoints
     end
     if config.custom_test_method_names then
       custom_test_method_names = config.custom_test_method_names
